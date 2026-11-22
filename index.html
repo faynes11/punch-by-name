@@ -1,1 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панч-машина по имени</title>
+    <style>
+        :root {
+            --bg: #0c0c0f;
+            --card: #151519;
+            --panel: #1e1e24;
+            --border: rgba(210, 42, 62, 0.35);
+            --accent: #b81d32;
+            --accent-bright: #df2942;
+            --text: #f4f4f6;
+            --muted: #9a9aa6;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 50% 25%, rgba(184, 29, 50, 0.22), transparent 55%),
+                linear-gradient(180deg, #0b0b0e 0%, #111116 100%);
+            color: var(--text);
+            font-family: var(--font);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .box {
+            width: 100%;
+            max-width: 440px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(184, 29, 50, 0.14);
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .heading {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .tag {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(217, 182, 104, 0.14);
+            color: #e2be6b;
+            border: 1px solid rgba(217, 182, 104, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--panel);
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-bright);
+            box-shadow: 0 0 0 3px rgba(223, 41, 66, 0.2);
+        }
+
+        .modes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            padding: 10px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--panel);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .mode-btn.active {
+            background: rgba(184, 29, 50, 0.24);
+            border-color: var(--accent-bright);
+            color: var(--text);
+        }
+
+        .output {
+            min-height: 92px;
+            padding: 18px;
+            border-radius: 16px;
+            background: #0f0f13;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            transition: transform 0.12s ease, opacity 0.12s ease;
+        }
+
+        .output.pop {
+            transform: scale(0.98);
+            opacity: 0.55;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .roll-btn {
+            flex: 1;
+            padding: 15px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 120, 138, 0.28);
+            background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(184, 29, 50, 0.35);
+            transition: transform 0.12s ease, filter 0.15s ease;
+        }
+
+        .roll-btn:hover {
+            filter: brightness(1.07);
+        }
+
+        .roll-btn:active {
+            transform: scale(0.98);
+        }
+
+        .copy-btn {
+            width: 54px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--panel);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: border-color 0.15s ease, transform 0.12s ease;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent-bright);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="top">
+            <span class="heading">Ростер по имени</span>
+            <span class="tag" id="statusTag">МИКС</span>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="nameInput" placeholder="Введи имя (например, Полад)" maxlength="40" autocomplete="off">
+        </div>
+
+        <div class="modes">
+            <button class="mode-btn active" data-mode="mix" onclick="setMode('mix', this)">Микс</button>
+            <button class="mode-btn" data-mode="rhyme" onclick="setMode('rhyme', this)">Рифма</button>
+            <button class="mode-btn" data-mode="roast" onclick="setMode('roast', this)">Жёстче</button>
+        </div>
+
+        <div class="output" id="resultBox">Введи имя и жми «Крутить»</div>
+
+        <div class="actions">
+            <button class="roll-btn" onclick="generateLine()">Крутить</button>
+            <button class="copy-btn" id="copyBtn" onclick="copyResult()" title="Скопировать">КОП</button>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'mix';
+        let lastLine = '';
+
+        const endingRhymes = [
+            { suffix: 'ад', rhymes: ['даун', 'раунд', 'балласт', 'каскад', 'засад', 'аппарата баг'] },
+            { suffix: 'ан', rhymes: ['баклан', 'болван', 'капкан', 'дурман', 'стакан', 'сюрприз-капкан'] },
+            { suffix: 'ар', rhymes: ['кошмар', 'угар', 'базар', 'фонарь', 'сухарь', 'инвентарь'] },
+            { suffix: 'ик', rhymes: ['нубик', 'кубик', 'тупик', 'шизик', 'чудик', 'психик'] },
+            { suffix: 'ок', rhymes: ['дурачок', 'мешок', 'косяк', 'шнурок', 'сверчок', 'пустячок'] },
+            { suffix: 'он', rhymes: ['бетон', 'картон', 'флакон', 'батон', 'загон', 'полигон'] },
+            { suffix: 'ер', rhymes: ['лузер', 'мусор', 'юзер', 'шулер', 'плейер', 'буфер'] },
+            { suffix: 'ля', rhymes: ['петля', 'сопля', 'земля', 'херня', 'шляпа дня'] }
+        ];
+
+        const roasts = [
+            '{name} — идиот',
+            '{name} — даун',
+            '{name}, у тебя снова крашнулась извилина',
+            '{name}, уровень IQ ушёл в отрицательный баланс',
+            '{name}, даже автокоррекция сдалась на твоём имени',
+            '{name}, ты не ошибка, ты прецедент',
+            '{name}, тебе бы инструкцию к самому себе',
+            '{name}, звучит как название бага',
+            '{name}, мозг в режиме энергосбережения с рождения',
+            '{name}, главный спонсор фейспалмов'
+        ];
+
+        const rhymeTemplates = [
+            '{name} — {rhyme}',
+            '{name} опять {rhyme}',
+            'Ну ты и {rhyme}, {name}',
+            '{name}, чисто {rhyme}'
+        ];
+
+        function formatName(raw) {
+            const cleaned = raw.trim().replace(/\s+/g, ' ');
+            if (!cleaned) return 'Полад';
+            return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+        }
+
+        function findRhyme(name) {
+            const lower = name.toLowerCase();
+            for (const item of endingRhymes) {
+                if (lower.endsWith(item.suffix)) {
+                    return pick(item.rhymes);
+                }
+            }
+            const lastChar = lower.slice(-1);
+            if ('ая'.includes(lastChar)) return pick(['шляпа', 'херня', 'туфта', 'лажа']);
+            if ('оеё'.includes(lastChar)) return pick(['дно', 'пятно', 'бревно', 'кино']);
+            if ('иы'.includes(lastChar)) return pick(['нубы', 'дубы', 'тупы', 'гробы']);
+            return pick(['даун', 'идиот', 'баклан', 'лузер', 'косяк', 'дурачок']);
+        }
+
+        function pick(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function setMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('statusTag').textContent = btn.textContent.toUpperCase();
+        }
+
+        function buildPhrase(name) {
+            const useRhyme =
+                currentMode === 'rhyme' ||
+                (currentMode === 'mix' && Math.random() < 0.55);
+
+            if (useRhyme) {
+                const tpl = pick(rhymeTemplates);
+                const rhyme = findRhyme(name);
+                return tpl.replace('{name}', name).replace('{rhyme}', rhyme);
+            }
+
+            return pick(roasts).replace('{name}', name);
+        }
+
+        function generateLine() {
+            const input = document.getElementById('nameInput');
+            const name = formatName(input.value);
+            if (!input.value.trim()) {
+                input.value = name;
+            }
+
+            let line = buildPhrase(name);
+            let guard = 0;
+            while (line === lastLine && guard < 8) {
+                line = buildPhrase(name);
+                guard++;
+            }
+            lastLine = line;
+
+            const out = document.getElementById('resultBox');
+            out.classList.add('pop');
+            setTimeout(() => {
+                out.textContent = line;
+                out.classList.remove('pop');
+            }, 90);
+        }
+
+        function copyResult() {
+            const out = document.getElementById('resultBox').textContent.trim();
+            if (!out || out === 'Введи имя и жми «Крутить»') return;
+
+            navigator.clipboard?.writeText(out).catch(() => {});
+            const btn = document.getElementById('copyBtn');
+            const prev = btn.textContent;
+            btn.textContent = 'ОК';
+            setTimeout(() => {
+                btn.textContent = prev;
+            }, 900);
+        }
+
+        document.getElementById('nameInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') generateLine();
+        });
+    </script>
+</body>
+</html>
 
